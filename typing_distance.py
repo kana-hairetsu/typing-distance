@@ -304,6 +304,16 @@ def kana_to_romaji(text: str, n_policy: str = "shortest") -> str:
 # ============================================================
 # 打鍵 = (物理キー, シフトキー or None)
 
+# お題文に残すが、どの配列でも打鍵に含めない文字。
+# ダッシュ「―」は入力方法が配列ごとにまちまちで、比較の条件を揃えられないため外す。
+NOT_TYPED = "―"
+
+
+def typed_text(text: str) -> str:
+    """打鍵の対象になる文字だけを残す"""
+    return "".join(c for c in text if c not in NOT_TYPED)
+
+
 def _raise_unmapped(layout, chars, kind="かな"):
     """未定義文字があれば ValueError にする
 
@@ -326,6 +336,7 @@ def keystrokes_romaji(text: str, layout) -> list:
     配列に存在しない文字を黙って捨てると比較結果が過小評価されるため、
     未定義文字が1つでもあれば ValueError にする。
     """
+    text = typed_text(text)
     romaji = kana_to_romaji(text)
     strokes = []
     unmapped = []
@@ -387,6 +398,7 @@ def keystrokes_kana(text: str, kana_layout, segment_policy=None,
     「ち」+「ょ」には分解されない。両者が食い違うのは、同じかな列に
     複数の打ち方が定義されていて、長い方が却って打鍵数を増やす場合。
     """
+    text = typed_text(text)
     policy = segment_policy or kana_layout.get("segment_policy") or "min_actions"
     m = {k: v for k, v in kana_layout["map"].items() if v}
     maxlen = max((len(k) for k in m), default=1)
@@ -643,6 +655,7 @@ def strokes_min_distance(text, kana_layout, geom, beam=3000,
 
     beam: 各位置で保持する状態数の上限（安全弁）。
     """
+    text = typed_text(text)
     if count_shift is not None:
         include_chord_keys = count_shift
 
