@@ -77,6 +77,14 @@ HAND_OF_KEY.update({"lshift": "L", "rshift": "R"})
 FINGER_OF_KEY.update({"lshift": 0, "rshift": 7})
 ALL_PHYSICAL_KEYS |= SHIFT_KEYS
 
+# --- 外側のキー ---
+# 左右対称の自作キーボードには、A の左（ANSI の CapsLock の位置）にも文字キーを
+# 置く配列がある（ブリ中トロ配列の「：」など）。指は左小指。位置は実座標で持つ。
+OUTER_KEYS = {"caps"}
+HAND_OF_KEY.update({"caps": "L"})
+FINGER_OF_KEY.update({"caps": 0})
+ALL_PHYSICAL_KEYS |= OUTER_KEYS
+
 # --- 親指キー ---
 # 幅が不揃いなので、指キーのような col 計算ではなく実座標を直接持たせる。
 THUMB_KEYS = {"space", "muhenkan", "henkan", "kana", "lthumb", "rthumb"}
@@ -124,6 +132,8 @@ ROW_STAGGERED = Geometry(
         "lthumb": (4.0, -1.0), "rthumb": (9.5, -1.0),
         # 下段: LShift 2.25u / 10キー / RShift 2.75u
         "lshift": (1.125, 0.0), "rshift": (13.625, 0.0),
+        # 中段: CapsLock 1.75u
+        "caps": (0.875, 1.0),
     },
 )
 
@@ -136,6 +146,7 @@ ORTHOLINEAR = Geometry(
         "henkan": (7.5, -1.0), "kana": (8.5, -1.0),
         "lthumb": (3.5, -1.0), "rthumb": (7.5, -1.0),
         "lshift": (-0.5, 0.0), "rshift": (10.5, 0.0),
+        "caps": (-0.5, 1.0),
     },
 )
 
@@ -151,6 +162,7 @@ COLUMN_STAGGERED = Geometry(
         "henkan": (7.0, -1.0), "kana": (8.0, -0.75),
         "lthumb": (4.0, -1.0), "rthumb": (7.0, -1.0),
         "lshift": (-0.5, 0.0), "rshift": (10.5, 0.0),
+        "caps": (-0.5, 1.0),
     },
 )
 

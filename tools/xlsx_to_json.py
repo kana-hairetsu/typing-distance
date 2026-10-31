@@ -15,10 +15,10 @@ import json
 import sys
 from openpyxl import load_workbook
 
-from typing_distance import (PHYSICAL_ROWS, THUMB_KEYS, SHIFT_KEYS,
+from typing_distance import (PHYSICAL_ROWS, THUMB_KEYS, SHIFT_KEYS, OUTER_KEYS,
                              keystrokes_kana, compute, GEOMETRIES)
 
-VALID_KEYS = set(THUMB_KEYS) | set(SHIFT_KEYS)
+VALID_KEYS = set(THUMB_KEYS) | set(SHIFT_KEYS) | set(OUTER_KEYS)
 for _row in PHYSICAL_ROWS.values():
     VALID_KEYS |= set(_row)
 

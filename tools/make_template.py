@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 
 import json
 import sys
-from typing_distance import (PHYSICAL_ROWS, THUMB_KEYS, SHIFT_KEYS,
+from typing_distance import (PHYSICAL_ROWS, THUMB_KEYS, SHIFT_KEYS, OUTER_KEYS,
                              keystrokes_kana, parse_entry, GEOMETRIES, compute)
 
 GROUPS = {
@@ -54,6 +54,7 @@ def build_template(path="layout_template.json"):
             "指キー": " ".join("".join(v) for v in PHYSICAL_ROWS.values()),
             "親指キー": " / ".join(sorted(THUMB_KEYS)),
             "シフトキー": " / ".join(sorted(SHIFT_KEYS)),
+            "外側キー": "caps（A の左。左右対称キーボードの左端の列）",
         },
         "_補足": [
             "拗音・外来音を分解して打つ配列なら、それらは空欄のままで構いません。",
@@ -74,7 +75,7 @@ def validate(path, sample_text=None):
     with open(path, encoding="utf-8") as f:
         doc = json.load(f)
     m = doc.get("map", {})
-    valid_keys = set(THUMB_KEYS) | set(SHIFT_KEYS)
+    valid_keys = set(THUMB_KEYS) | set(SHIFT_KEYS) | set(OUTER_KEYS)
     for row in PHYSICAL_ROWS.values():
         valid_keys |= set(row)
 
