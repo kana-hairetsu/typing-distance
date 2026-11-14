@@ -655,6 +655,10 @@ def compute(strokes, geom: Geometry, include_chord_keys=True,
 # ============================================================
 # 6. レポート出力
 # ============================================================
+# 読み飛ばし（未定義文字）1文字あたりの罰則。どんな打ち方よりも十分に大きい値
+SKIP_PENALTY = 1e9
+
+
 def strokes_min_distance(text, kana_layout, geom, beam=3000,
                          simul_policy="centroid", space_hand="opposite",
                          thumb_separate=True, include_chord_keys=True,
@@ -712,12 +716,17 @@ def strokes_min_distance(text, kana_layout, geom, beam=3000,
                     dp[i + ln][nkey] = (nc, (i, skey, st_list))
 
         if not matched_any:
-            if text[i].strip():
-                unmapped.append(text[i])
+            # どの定義にも当たらない1文字は読み飛ばす。
+            # 「しゃ」を1打で打つ配列では、「し」を打った直後の位置（ゃ）に
+            # 当たる定義がないことがある。そこを素通りできると、読み飛ばしの
+            # 経路が不当に安くなるので、大きな罰則を課して最後の手段にする。
+            # 未定義かどうかは、最終的に選ばれた経路で読み飛ばしたかで判断する。
+            pen = SKIP_PENALTY if text[i].strip() else 0.0
             for skey, (cost, _) in dp[i].items():
+                nc = cost + pen
                 cur = dp[i + 1].get(skey)
-                if cur is None or cost < cur[0] - 1e-12:
-                    dp[i + 1][skey] = (cost, (i, skey, None))
+                if cur is None or nc < cur[0] - 1e-12:
+                    dp[i + 1][skey] = (nc, (i, skey, None))
 
     if not dp[n]:
         return keystrokes_kana(text, kana_layout, segment_policy="min_actions"), None
@@ -731,7 +740,11 @@ def strokes_min_distance(text, kana_layout, geom, beam=3000,
         prev_i, prev_key, st_list = back
         if st_list:
             strokes = st_list + strokes
+        elif text[prev_i].strip():
+            unmapped.append(text[prev_i])
+            total -= SKIP_PENALTY
         pos, skey = prev_i, prev_key
+    unmapped.reverse()
 
     if unmapped and not allow_unmapped:
         _raise_unmapped(kana_layout, unmapped)
